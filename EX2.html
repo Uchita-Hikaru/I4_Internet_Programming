@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EX2</title>
+    <style>
+      :root {
+        --width: 640;
+      }
+      #viewport{
+       border: 1px solid black;
+       background-color: white;
+      }
+      .wrapper{
+        width:calc(var(--width)*1px);
+        background: gray;
+        color: white;
+        padding: 10px;
+      }
+      #play_button{
+          background-color: white;
+          color: black;
+      }
+    </style>
+</head>
+<body>
+    <center>
+      <div class="wrapper">
+        <canvas id="viewport" width="640px", height="480px"></canvas>
+        <div>Canvas 👻:Please so your face on me</div>
+        <button id="play_button" disabled onclick="openWebcam()">Play</button>
+      </div>
+    </center>
+    
+    <script>
+        var r = document.querySelector(':root');
+
+        const canvas = document.querySelector('#viewport');
+        var video = document.createElement('video');
+        video.autoplay = true;
+        video.playsInline = true;
+        let playing = false;
+
+        function openWebcam() {
+            playing = !playing;
+            console.log('playing: ', playing); 
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            r.style.setProperty('--width', canvas.width);
+            (function loop() {
+                if(playing){
+                    canvas.getContext('2d').drawImage(video,0,0, canvas.width, canvas.height);
+                    setTimeout(loop, 1000 / 30); //30fps
+                }
+            })();
+            document.querySelector('#play_button').innerHTML = playing ? 'Pause' : 'Play';
+            console.log('playing: ', playing); 
+        }
+
+
+        function onOpenCvReady() {
+            console.log('OpenCV.js is ready.');
+            document.querySelector('#play_button').disabled = false
+        }
+        // * Access camera
+        navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: true
+        }).then((stream) => {
+            video.srcObject = stream;
+        }).catch((err) => {
+            console.log('navigator.MediaDevices.getUser error: '. err.message, err.name );    
+        })
+
+    </script>
+    <script async src="./opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
+</body>
+</html>

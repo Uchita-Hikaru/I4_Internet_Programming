@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EX1</title>
+    <style>
+      :root {
+        --width: 500;
+      }
+      #canvas{
+       border: 1px solid black;
+       background-color: white;
+      }
+      .wrapper{
+        width:calc(var(--width)*1px);
+        background: gray;
+        color: white;
+        padding: 10px;
+      }
+    </style>
+</head>
+<body>
+    <center>
+      <div class="wrapper">
+        <canvas id="canvas" width="500px", height="500px"></canvas>
+        <div>Canvas 👻:Insert me an image please</div>
+        <input type="file" id="imageInput" accept="image/*"/>
+      </div>
+    </center>
+    
+    <script type="text/javascript">
+      var r = document.querySelector(':root');
+
+      let inputImage = document.getElementById("imageInput");
+      inputImage.addEventListener("change", function(event){
+            var image = event.target.files[0];
+            console.log(image);
+            handleImage(image);
+      })
+
+      function handleImage(uploadedImgFile){
+        var reader = new FileReader();
+        reader.onload = function (event){
+          var img = new Image();
+          img.onload = function (){
+            var canvas = document.getElementById("canvas");
+            canvas.width = img.width;
+            r.style.setProperty('--width', img.width)
+            canvas.height = img.height;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+          }
+          img.src = event.target.result;
+        }
+        reader.readAsDataURL(uploadedImgFile);
+      }
+      function onOpenCvReady() {
+        console.log('OpenCV.js is ready.');
+      }
+    </script>
+    <script async src="./opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
+</body>
+</html>
