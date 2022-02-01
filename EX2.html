@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Form</title>
+    <link rel="stylesheet" type="text/css" href="./asset/loginForm.css">
+</head>
+<body onload="checkCookie()">
+    <div class="container" id="login-page">
+        <div class="info">
+            <div>Given login info:</div>
+            <div>Email: gic@gmail.com</div>
+            <div>Pwd: Gic123</div>
+        </div>
+        <div class="account-entry">
+            <div class="profile">
+                <img src="./asset/profile.png">
+            </div>
+            <div><b>Email</b></div>
+            <input type="text" id="email" placeholder="Enter Email">
+            <div><b>Password</b></div>
+            <input type="text" id="password" placeholder="Enter Password">
+            <div>
+                <button id="login" onclick="onlogin()">Login</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        var email = "gic@gmail.com"
+        var password = "Gic123"
+
+        function onlogin(){
+            const login_email = document.getElementById("email").value
+            const login_password = document.getElementById("password").value
+            if(email==login_email && password==login_password){
+                setCookie("email",email)
+                setCookie("password",password)
+                setHomepage()
+            }else{
+                alert("Email or Password not correct!")
+            }
+        }
+        function setHomepage() {
+            let homePage = document.getElementById('login-page')
+            homePage.innerHTML=`<div class="home-page-container">
+                                    <div><h3>Welcome to Home Page</h3></div>
+                                    <div>You will automatically logged out</div>
+                                    <div>Keep refreshing your page</div>
+                                    <button id="logout" onclick="onlogout()">Logout</button>
+                                </div>`
+        }
+
+        function onlogout(){
+            removeCookie()
+            location.reload()
+        }
+
+        function setCookie(cname,cvalue) {
+            const d = new Date();
+            d.setTime(d.getTime() + (30*1000));
+            let expires = "expires=" + d.toUTCString();
+            document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+        }
+        function getCookie(cname) {
+            let name = cname + "=";
+            let decodedCookie = decodeURIComponent(document.cookie);
+            let ca = decodedCookie.split(';');
+            for(let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+        function removeCookie(){
+            document.cookie = "email=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "password=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        }
+        function checkCookie() {
+            let check = getCookie("email");
+            if (check != "") {
+                setHomepage();
+            } 
+        } 
+
+    </script>
+</body>
+</html>

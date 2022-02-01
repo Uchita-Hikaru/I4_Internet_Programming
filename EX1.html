@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD</title>
+    <link rel="stylesheet" type="text/css" href="./asset/CRUD.css">
+</head>
+<body>
+    <div class="container">
+        <div class="entry-container">
+            <div>Name:</div>
+            <input type="text" id="name" placeholder="c programming">
+            <div>Category:</div>
+            <input type="text" id="category" placeholder="coding">
+            <div>Price:</div>
+            <input type="text" id="price" placeholder="10$"> 
+            <div>
+                <button onclick="addBook()">Add</button>
+            </div>
+            
+        </div>
+        <div class="list-container">
+            <div id="grid">
+                <div id="box">
+                    <button>Delete</button>
+                    <button>Change Name</button>
+                    <div class="image">
+                         <img src="./asset/book.png">
+                    </div>
+                    <div class="info">Name:</div>
+                    <div class="info">Category:</div>
+                    <div class="info">Price:</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var books = []
+            // {name: "Book1", category: "English", price: 5},
+            // {name: "Book2", category: "English", price: 5},
+            // {name: "Book3", category: "English", price: 5},
+            // {name: "Book4", category: "English", price: 5},
+            // {name: "Book5", category: "English", price: 5}]
+
+        function saveBooks(){
+            window.localStorage.setItem('books', JSON.stringify(books))
+        }
+        function clearStorage(){
+            localStorage.removeItem('books')
+        }
+        function renderList(){
+            const storedbooks = localStorage.getItem('books', JSON.parse)
+            books = JSON.parse(storedbooks)
+
+            let bookGridDiv = document.getElementById("grid")
+            let boxes = ''
+            bookGridDiv.innerHTML = '';
+            books.forEach((item, i) => {
+                boxes += `<div id="box">
+                            <button onclick="deleteBook(${i})">Delete</button>
+                            <button onclick="updateBook(${i})">Change Name</button>
+                            <div class="image">
+                                <img src="./book.png">
+                            </div>
+                            <div class="info">Name: ${item.name}</div>
+                            <div class="info">Category: ${item.category}</div>
+                            <div class="info">Price: ${item.price}$</div>
+                          </div>`
+            })
+            bookGridDiv.innerHTML = boxes
+        }
+        renderList()
+
+        function addBook(){
+            const name = document.getElementById("name").value
+            const category = document.getElementById("category").value
+            const price = document.getElementById("price").value
+            books.push({name, category, price})
+            clearStorage()
+            saveBooks()
+            renderList()
+        }
+        function deleteBook(index){
+            books.splice(index, 1)
+            clearStorage()
+            saveBooks()
+            renderList()
+        }
+        function updateBook(index){
+            let newBookName = prompt("Enter a new book name")
+            console.log(newBookName)
+            if(newBookName){
+                books[index]['name'] = newBookName
+                clearStorage()
+                saveBooks()
+                renderList(); 
+                alert("Book Name is updated.")
+            }else{
+                alert("New Book Name is not found.")
+            }
+            
+        }
+    </script>
+    
+</body>
+</html>
