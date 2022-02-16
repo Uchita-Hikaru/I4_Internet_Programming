@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width= , initial-scale=1.0">
+    <title>EX1</title>
+    <style>
+        .container{
+            width: 500px;
+            height: 600px;
+            background-color: gray;
+            margin: 10px auto;
+            padding: 5px;
+        }
+        #scrollable{
+            width: 100%;
+            height: 100%;
+            overflow-y: scroll;
+        }
+        .item{
+            background-color: white;
+            height: 80px;
+            padding: 5px;
+            margin-bottom: 5px;
+            margin-right: 3px;
+            border-radius: 3px;
+        }
+        #page {
+           text-align: center;
+        }
+        .loader {
+            margin: 20px auto 50px;
+            border: 8px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 8px solid blue;
+            border-bottom: 8px solid blue;
+            width: 40px;
+            height: 40px;
+            -webkit-animation: spin 2s linear infinite;
+            animation: spin 2s linear infinite;
+        }
+        @-webkit-keyframes spin {
+            0% { -webkit-transform: rotate(0deg); }
+            100% { -webkit-transform: rotate(360deg); }
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="scrollable">
+            <div class="scroll-container">
+                <div id="item-container"></div>
+                <div id="loader-container"></div>
+            </div>
+        </div>
+    </div>
+    <div id="page">
+        <h1></h1>
+    </div>
+    <script>
+        let currentPageNumber = 0;
+        let maxPage = 0;
+        let loading = false;
+        let outPut = '';
+
+        const loader = document.getElementById("loader-container");
+
+        const loadData = () => {
+            maxPage = localStorage.getItem('maxPage');
+            if(maxPage==null || maxPage==currentPageNumber){
+                //console.log(maxPage)
+                //console.log("loading");
+                loading=true;
+                loader.innerHTML=`<div id="loader-container">
+                                    <div class="loader"></div>
+                                </div>`;
+                fetch(`https://api.instantwebtools.net/v1/passenger?page=${currentPageNumber}&size=${15}`).then( async (res)=>{
+                    res = await res.json();
+                    localStorage.setItem(`${currentPageNumber}`, JSON.stringify(res));
+                    let passenger = '';
+                    currentPageNumber++;
+                    maxPage=currentPageNumber;
+                    localStorage.setItem('maxPage', maxPage)
+                    //console.log(res.data);
+                    for (let n = 0; n < 15; n++) {
+                            passenger = res.data[n].airline;
+                            // console.log(passenger);
+
+                            outPut += `<div class="item">
+                                        <div>✈️: ${passenger[0].name} - ${passenger[0].country}</div>
+                                        <div>🙂: ${res.data[n].name}</div>
+                                    </div>`
+                    }
+                    console.log(outPut)
+                    setTimeout(() => {
+                        loading = false;
+                        loader.innerHTML=`<div id="loader-container"></div>`;
+                    }, 2000)
+                });
+            }else if(maxPage>0){
+                let passengerArr = [];
+                for(let i=0; i<maxPage; i++){
+                    passengerArr[i] = JSON.parse(localStorage.getItem(`${i}`));
+                    //console.log(passengerArr[i].data)
+                    for(let j=0;j<15;j++){
+                        passenger = passengerArr[i].data[j].airline;
+                        outPut += `<div class="item">
+                                        <div>✈️: ${passenger[0].name} - ${passenger[0].country}</div>
+                                        <div>🙂: ${passengerArr[i].data[j].name}</div>
+                                    </div>`
+                    }
+                    currentPageNumber = maxPage;
+                }
+            }
+            // render HTML
+            let item = document.getElementById("item-container");
+            item.innerHTML = outPut;
+            console.log(outPut)
+            let page = document.getElementById("page");
+            page.innerHTML =`<h1>${currentPageNumber}</h1>`;  
+        }
+
+        loadData();
+        const scroller = document.getElementById('scrollable');
+        scroller.addEventListener('scroll', onScroll);
+
+        function onScroll(){
+            const { scrollHeight, scrollTop, clientHeight } = scroller;
+            //console.log(scrollHeight, scrollTop, clientHeight);
+            if(scrollHeight <= (clientHeight + Math.round(scrollTop)) && !loading){
+                    console.log(currentPageNumber)
+                    loadData();
+            }    
+        }
+
+
+    </script>
+</body>
+</html>
